@@ -8,6 +8,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.sql.Types.NULL;
+
 public class RepositoryImpl implements Repository {
     private Connection getConnection() throws SQLException {
         return ConexionBD.getInstance();
@@ -47,13 +49,26 @@ public class RepositoryImpl implements Repository {
     }
 
     @Override
-    public void save(Object o) {
-
+    public void save(Producto o) {
+        try (PreparedStatement stmt = getConnection().prepareStatement("INSERT INTO productos VALUES (?,?,?)");) {
+            stmt.setInt(1, NULL);
+            stmt.setString(2, o.getNombre());
+            stmt.setDouble(3, o.getPrecio());
+            stmt.executeUpdate();
+            System.out.println("Conexion realizada con exito");
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void delete(Long id) {
-
+        try (PreparedStatement stmt = getConnection().prepareStatement("DELETE FROM productos WHERE id ="+ id);) {
+            stmt.executeUpdate();
+            System.out.println("Eliminado con exito");
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Producto createProduct(ResultSet resultSet) throws SQLException {
